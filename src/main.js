@@ -58,6 +58,7 @@ async function weldFilm() {
   console.log('[weld] IK', JSON.stringify({ project: id, params, fails: plan.report.fails, worstMm: +(plan.report.worst * 1000).toFixed(3) }));
   return {
     duration: plan.duration, cues: plan.cues, marks: plan.marks,
+    weld: { P, robot, buildPlan },      // re-plan with other seeds (scripts/seed-search.mjs)
     /** Draw film second t. Pure: any t, in any order. */
     seek(t) {
       const q = plan.sample(t);
@@ -98,7 +99,7 @@ function debugCam() {
 }
 const seek = t => film.seek(t);
 
-window.__film = { id, params, duration: film.duration, fps: 30, seek, cues: { ...film.cues, voice: P.voice || [], bgm: P.bgm || null }, marks: film.marks, scene: st.scene };   // scene: for probes (scripts in a page context)
+window.__film = { id, params, duration: film.duration, fps: 30, seek, cues: { ...film.cues, voice: P.voice || [], bgm: P.bgm || null }, marks: film.marks, scene: st.scene, weld: film.weld };   // scene, weld: for probes (scripts in a page context, e.g. scripts/seed-search.mjs)
 seek(0);
 document.getElementById('loading').remove();
 

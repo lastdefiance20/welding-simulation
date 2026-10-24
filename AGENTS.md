@@ -28,6 +28,12 @@ npm run export-assets [-- --gap 3]                            # src/specimens, s
 - **로봇:** UR5e 베이스가 원점에 있고 +x를 향합니다. 로봇의 오른쪽이 +z입니다.
 - **로봇 2F 시편:** 용접 모서리가 x = 0.50에 있고 z를 따라 놓입니다. 용접은 +z에서 −z로 진행하고, 토치는 −x 쪽에서 들어갑니다.
 - **사람 2F 시편:** 모서리가 x = −0.22에 있습니다. 사람은 x = −0.64에서 +x를 보고 섭니다.
+- **2F 시편 배치:** `buildSpecimen({ gap, wx })`의 `wx`로 모서리의 x를 정합니다. 용접선은 +z에서 −z로 진행합니다.
+- **3F 시편 배치:** `buildSpecimen({ gap })`에는 `wx`가 없고 위치가 정해져 있습니다(`src/specimens/t3f.js`의 `CX`, `RISER`).
+  - 모서리는 x = 0.65, 높이 0.16 m 받침 위에 있고, 용접선은 아래에서 위로 진행합니다.
+  - 시편은 수직축으로 −45° 돌아가 있어서 모서리의 열린 쪽(이등분선)이 −x(로봇)를 향합니다. 보강판은 (−x, −z) 쪽으로, 바닥판은 (−x, +z)와 (+x, −z)를 잇는 방향으로 놓입니다.
+  - 그래서 측면 근접 컷은 +z 쪽에서 찍습니다. −z 쪽에서는 보강판에 가립니다.
+- **시편 치수 이름은 시편마다 다릅니다.** 2F는 `SPEC.plate.{L,W,T}`, `SPEC.stiff.{L,H,T}`이고, 3F는 `SPEC.plate.{H,W,T}`, `SPEC.stiff.{H,W,T}`입니다. 둘 다 있는 것은 `SPEC.weld.L`입니다. 예제의 스펙 카드를 다른 시편에 복사하면 이름을 맞춰야 합니다.
 - URDF는 Z가 위쪽입니다. `src/robot/ur5e.js`가 루트를 x축으로 −90° 돌려서 월드 = (bx, bz, −by)가 됩니다. `fk`와 `ik`는 월드 좌표를 그대로 받고 돌려줍니다.
 - **토치:** `tool0`(플랜지 면, +z가 바깥)에 원점이 오도록 붙어 있습니다. TCP(와이어 끝)는 `tool0`에서 약 (0, 0, 0.33)이고 노즐 축은 플랜지 축과 33.9°입니다. **토치가 33 cm 길어서 작업 범위와 충돌이 배치를 좌우합니다.**
 
@@ -53,7 +59,7 @@ export default {
       scene,             // THREE.Group: 시편, 소품 (로봇은 엔진이 넣음)
       collide, obstacles,// 시편이 주는 스패터 충돌 함수와 박스 (buildSpecimen 반환값 그대로)
       welds: [defineWeld(id, seam, opts)],
-      home,              // { q: [rad x6] } | { like: weldId, back, up } | { like, p }
+      home,              // { q: [deg x6] } | { like: weldId, back, up } | { like, p }   (q는 도 단위)
       steps,             // 아래 참고
       shots(plan),       // [[시작 s, (t, u) => ({ pos, look, fov, filter? })], ...] 다음 샷 시작까지 하드 컷
       cards(plan),       // [{ cls: 'title'|'spec'|'endcard', from, to, html }]
@@ -103,6 +109,8 @@ import { rigCamera } from '../../src/views.js';
 
 - 모든 카메라 모델에는 `view` 노드가 있고, 그 노드의 **−z가 시선**입니다.
 - 로봇에 다는 카메라는 `robot.links.tool0`(또는 `wrist_3_link`)의 자식으로 붙입니다. 예시는 `example-robot`의 손목 카메라입니다.
+  - `example-robot`에서 손목 카메라의 위치(`at`)와 `lookAt`의 up 벡터는 **`tool0` 좌표계**입니다.
+  - up이 `v(0, 1, 0)`이면 토치가 아래를 볼 때(2F) 화면이 똑바로 나옵니다. 토치가 수평일 때(3F)는 90° 돌아가 보이니 up을 바꿔서 맞춥니다.
 - 사람 머리에 다는 카메라는 `loadWorker(url, { egoCam: true })`의 `egoCam` 노드에 붙입니다. 예시는 `example-human`입니다.
 
 ## 나레이션과 음악
@@ -120,13 +128,15 @@ import { rigCamera } from '../../src/views.js';
    - 렌더할 때 콘솔에 `[weld] IK {"fails":0,"worstMm":0.02}`가 나와야 합니다. `fails`가 0이 아니면 그 구간에서 토치가 목표를 벗어난 것입니다.
    - 이때는 `seed`와 `flangeDir`를 바꾸거나 시편을 옮깁니다.
    - 여러 seed를 한 번에 시험하려면 페이지 안에서 `buildPlan`을 여러 번 부르는 작은 스크립트를 쓰면 빠릅니다. `example-robot`의 seed가 이렇게 찾은 값입니다.
+   - `npm run seed-search -- --project <id>`는 여러 seed와 flangeDir 조합으로 계획을 다시 풀어, IK 실패 수와 관절 이동량이 적은 순서로 보여줍니다. 후보는 `--seeds '[[...],[...]]'`로 직접 줄 수 있습니다. 순위는 IK만 본 것이라, 고른 seed로 스틸을 찍어 팔이 시편이나 테이블에 닿지 않는지 꼭 확인합니다.
 2. **스틸로 봅니다.**
    - `npm run stills -- <times> --project <id>`로 확인합니다.
    - 샷마다 하나씩, 그리고 아크 시작, 중간, 끝을 봅니다.
    - 리그 카메라 시점은 `--query view=<name>`으로 따로 봅니다.
    - **결과 이미지를 직접 열어 확인하세요.** 숫자만 보고 끝내지 않습니다.
 3. **충돌을 눈으로 확인합니다.** 토치 몸통, 호스, 손목 링크가 시편이나 테이블에 닿지 않는지 시작점과 끝점의 근접 스틸로 봅니다. 자동 충돌 검사는 아직 없습니다.
-4. **렌더합니다.** `--draft`로 먼저 전체 흐름을 보고 마지막에 풀 화질로 뽑습니다.
+4. **렌더합니다.** `--draft`로 먼저 전체 흐름을 보고 마지막에 풀 화질로 뽑습니다. `--from`과 `--to`로 일부만 뽑으면 파일 이름에 `-t<from>-<to>`가 붙어서 전체 렌더를 덮어쓰지 않습니다.
+5. **샷 시간을 맞춥니다.** 예제의 샷 전환 시각(`w.start + 4.6` 등)은 용접 시간 18초에 맞춘 값입니다. `duration`이나 `steps`를 바꾸면 샷 시각도 다시 정합니다. `w.start + w.duration * 0.25`처럼 비율로 쓰면 편합니다.
 
 ## 지켜야 할 것
 

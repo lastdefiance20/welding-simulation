@@ -6,7 +6,8 @@
     "dev": "node scripts/serve.mjs",
     "stills": "node scripts/stills.mjs",
     "render": "node scripts/render.mjs",
-    "export-assets": "node scripts/export-assets.mjs"
+    "export-assets": "node scripts/export-assets.mjs",
+    "seed-search": "node scripts/seed-search.mjs"
   },
   "dependencies": {
     "playwright-core": "^1.48.2",

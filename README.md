@@ -22,7 +22,7 @@ npm run render -- --project example-human --query gap=3              # 갭 3 mm 
 ```
 
 - 결과물은 모두 `out/`에 생기고, `out/`은 git에 올라가지 않습니다.
-  - **영상:** `out/<id>[-<param><값>][-<view>][-draft].mp4`. 예: `out/example-robot-gap3-wrist-draft.mp4`
+  - **영상:** `out/<id>[-<param><값>][-<view>][-t<from>-<to>][-draft].mp4`. 예: `out/example-robot-gap3-wrist-draft.mp4`
   - **스틸:** `out/stills/<id>[-...]/t<초>.jpg`
 - `--draft`는 720p로 빠르게 뽑습니다.
 - `--from`과 `--to`로 구간만 렌더할 수 있습니다.

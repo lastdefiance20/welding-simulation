@@ -60,7 +60,7 @@ export default {
         const wrist = wristCamera();
         const tool0 = robot.links.tool0, tip = robot.tcp.position.clone();
         const at = v(0, 0.08, 0.12);
-        wrist.matrix.lookAt(at, tip, v(0, 1, 0)).setPosition(at);   // its -z at the tip
+        wrist.matrix.lookAt(at, tip, v(0, 1, 0)).setPosition(at);   // its -z at the tip; up is tool0's +y (upright while the torch points down)
         wrist.matrix.decompose(wrist.position, wrist.quaternion, wrist.scale);
         tool0.add(wrist);
         tripod.userData.aim(v(WX, 0.06, 0));
@@ -71,6 +71,7 @@ export default {
         for (const c of Object.values(ctx.cameras)) c.sync();
       },
 
+      // Cut times follow the weld (w.start + ...), tuned for its 18 s of travel: retime them if duration changes.
       shots(plan) {
         const w = plan.welds[0], M = plan.marks;
         const arcZ = t => w.arcPoint(Math.min(Math.max(t, w.start), w.end)).z;

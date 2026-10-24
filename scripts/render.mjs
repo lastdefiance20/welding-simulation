@@ -12,8 +12,10 @@ const draft = process.argv.includes('--draft');
 const fps = +arg('fps', 30);
 fs.mkdirSync('out', { recursive: true });
 const { page, film, tag, close } = await openFilm();
-const out = arg('out', `out/${tag}${draft ? '-draft' : ''}.mp4`);
 const from = +arg('from', 0), to = +arg('to', film.duration);
+// A part (--from / --to) gets its range in the name, so it never overwrites the whole film.
+const range = arg('from') || arg('to') ? `-t${from}-${to}` : '';
+const out = arg('out', `out/${tag}${range}${draft ? '-draft' : ''}.mp4`);
 const frames = Math.round((to - from) * fps);
 
 const wav = out.replace(/\.mp4$/, '.wav');
