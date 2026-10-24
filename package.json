@@ -1,0 +1,15 @@
+{
+  "name": "welding-simulation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "stills": "node scripts/stills.mjs",
+    "render": "node scripts/render.mjs",
+    "export-assets": "node scripts/export-assets.mjs"
+  },
+  "dependencies": {
+    "playwright-core": "^1.48.2",
+    "three": "^0.170.0"
+  }
+}

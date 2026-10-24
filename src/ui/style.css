@@ -1,0 +1,59 @@
+:root {
+  --ink: #eef1f4; --dim: #8b949e; --accent: #ff7a1a; --data: #7fd8ff;
+  --sans: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+  --mono: "SF Mono", "JetBrains Mono", Menlo, monospace;
+}
+html, body { margin: 0; height: 100%; background: #000; color: var(--ink); font-family: var(--sans); overflow: hidden; }
+#viewport { position: fixed; inset: 0 0 48px 0; display: grid; place-items: center; }
+#stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: 0 0; overflow: hidden; background: #07090c; }
+#gl canvas { position: absolute; inset: 0; width: 1920px; height: 1080px; display: block; }
+#vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%); }
+#overlay { position: absolute; inset: 0; pointer-events: none; }
+.ov { position: absolute; visibility: hidden; opacity: 0; }
+
+.kicker { font: 600 20px/1 var(--mono); letter-spacing: 0.22em; color: var(--accent); }
+.title { left: 120px; bottom: 150px; }
+.title h1 { margin: 22px 0 12px; font-size: 150px; font-weight: 800; letter-spacing: -0.04em; line-height: 0.9; }
+.title h1 span { color: var(--accent); }
+.title .sub { font-size: 38px; font-weight: 500; color: #c9d1d9; letter-spacing: -0.01em; }
+
+.spec { left: 110px; top: 110px; padding: 30px 36px; min-width: 520px; background: rgba(10,13,17,0.62); border: 1px solid rgba(255,255,255,0.08); border-left: 3px solid var(--accent); backdrop-filter: blur(6px); }
+.spec .row { display: flex; justify-content: space-between; gap: 40px; font-size: 28px; line-height: 1.85; }
+.spec .row b { font-weight: 600; color: var(--dim); }
+.spec .row span { font-family: var(--mono); font-size: 25px; }
+
+.arc { right: 90px; top: 80px; font: 700 22px/1 var(--mono); letter-spacing: 0.3em; color: #fff; display: flex; align-items: center; gap: 14px; }
+.arc i { width: 14px; height: 14px; border-radius: 50%; background: #ff3b1a; box-shadow: 0 0 14px 4px rgba(255,80,30,0.8); }
+
+.hud { left: 90px; bottom: 80px; width: 470px; padding: 26px 30px 24px; background: rgba(8,10,13,0.6); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(6px); }
+.hud .lbl { font-size: 20px; color: var(--dim); font-weight: 600; letter-spacing: 0.04em; }
+.hud .lbl .seam { color: var(--ink); }
+.hud .mm { margin-top: 6px; font-family: var(--mono); }
+.hud .mm b { font-size: 64px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.hud .mm span { font-size: 26px; color: var(--dim); }
+.hud .bar { margin: 12px 0 20px; height: 4px; background: rgba(255,255,255,0.1); }
+.hud .bar i { display: block; height: 100%; background: var(--accent); transform-origin: 0 50%; transform: scaleX(0); }
+.hud .joints { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 26px; }
+.hud .j { display: grid; grid-template-columns: 34px 1fr 92px; align-items: center; gap: 10px; font: 18px var(--mono); }
+.hud .j span { color: var(--dim); }
+.hud .j em { font-style: normal; text-align: right; color: var(--data); font-variant-numeric: tabular-nums; }
+.hud .track { position: relative; height: 2px; background: rgba(255,255,255,0.15); }
+.hud .track i { position: absolute; top: -5px; width: 2px; height: 12px; background: var(--data); left: 50%; }
+
+.endcard { left: 0; right: 0; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; padding-left: 130px; background: linear-gradient(90deg, rgba(5,7,9,0.85) 0%, rgba(5,7,9,0.5) 45%, transparent 75%); }
+.endcard h2 { margin: 26px 0 16px; font-size: 120px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+.endcard .sub { font-size: 36px; color: #c9d1d9; }
+
+#player { position: fixed; left: 0; right: 0; bottom: 0; height: 48px; display: flex; align-items: center; gap: 14px; padding: 0 16px; background: #0d1014; border-top: 1px solid #1d232a; font: 14px var(--mono); }
+#player button { width: 34px; height: 30px; border: 0; border-radius: 6px; background: #1d232a; color: var(--ink); cursor: pointer; }
+#scrub { flex: 1; accent-color: var(--accent); }
+#time { width: 60px; text-align: right; color: var(--dim); font-variant-numeric: tabular-nums; }
+#loading { position: fixed; inset: 0; display: grid; place-items: center; font: 16px var(--mono); color: var(--dim); background: #07090c; }
+body.render #player, body.render #loading { display: none; }
+body.render #viewport { inset: 0; }
+body.render #stage { left: 0; top: 0; transform: none !important; }
+
+/* Rig camera insets (src/views.js): a frame and a name tag over each picture-in-picture view. */
+.insets { position: absolute; inset: 0; pointer-events: none; }
+.inset { position: absolute; box-sizing: border-box; border: 1.5px solid rgba(255, 255, 255, 0.55); border-radius: 4px; }
+.inset span { position: absolute; left: 10px; top: 8px; font: 600 15px/1 var(--mono); letter-spacing: 0.12em; color: #fff; background: rgba(0, 0, 0, 0.55); padding: 5px 8px; border-radius: 3px; }

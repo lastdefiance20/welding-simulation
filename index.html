@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Welding simulation</title>
+  <link rel="stylesheet" href="/src/ui/style.css">
+  <script type="importmap">{ "imports": { "three": "/three/build/three.module.js", "three/addons/": "/three/examples/jsm/" } }</script>
+</head>
+<body>
+  <div id="viewport">
+    <div id="stage">
+      <div id="gl"></div>
+      <div id="overlay"></div>
+      <div id="vignette"></div>
+    </div>
+  </div>
+  <div id="player">
+    <button id="play" aria-label="재생">▶</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" step="1">
+    <span id="time">0.00</span>
+  </div>
+  <div id="loading">loading…</div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

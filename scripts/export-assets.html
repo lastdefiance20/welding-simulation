@@ -1,0 +1,24 @@
+<!doctype html><html><head><meta charset="utf-8"><script type="importmap">{"imports":{"three":"/three/build/three.module.js","three/addons/":"/three/examples/jsm/"}}</script></head>
+<body><script type="module">
+// Bakes the assets built in code (src/specimens, src/props/sensors.js, src/props/torch.js) to GLB; run by scripts/export-assets.mjs.
+import * as THREE from 'three';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import * as T2F from '/src/specimens/t2f.js';
+import * as T3F from '/src/specimens/t3f.js';
+import { tripodCamera, headCamera, wristCamera, imu } from '/src/props/sensors.js';
+import { robotTorch } from '/src/props/torch.js';
+const gap = Number(new URLSearchParams(location.search).get('gap') || 0);
+const b64 = async obj => {
+  obj.traverse(o => { if (o.isMesh && o.material.map) o.material.map.userData.mimeType = 'image/jpeg'; });
+  const b = new Uint8Array(await new GLTFExporter().parseAsync(obj, { binary: true }));
+  let s = ''; for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode(...b.subarray(i, i + 0x8000));
+  return btoa(s);
+};
+// 2F: the base plate's underside on y = 0, the welded corner (robot side of the stiffener) along z at x = 0, y = 0.020.
+const a = T2F.buildSpecimen({ gap, wx: 0 }).group; a.name = 't-2f';
+// 3F: its own local frame (base plate face on x = 0, stiffener toward -x, standing on y = 0), without the riser.
+const b = T3F.buildSpecimen({ gap }).group.children[0]; b.parent.remove(b); b.position.set(0, 0, 0); b.rotation.set(0, 0, 0); b.name = 't-3f';
+window.__out = { 'specimens/t-2f': await b64(a), 'specimens/t-3f': await b64(b) };
+if (!gap) Object.assign(window.__out, { 'sensors/tripod-camera': await b64(tripodCamera()), 'sensors/head-camera': await b64(headCamera()), 'sensors/wrist-camera': await b64(wristCamera()), 'sensors/imu': await b64(imu()), 'torch/torch': await b64(robotTorch()) });
+window.__ready = 1;
+</script></body></html>

@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!-- UR5e, flattened from Universal Robots' ur_description (github.com/UniversalRobots/Universal_Robots_ROS2_Description,
+     rolling @ 81f7c9f, BSD-3-Clause, LICENSE): urdf/ur_macro.xacro with config/ur5e/default_kinematics.yaml,
+     joint_limits.yaml and visual_parameters.yaml (the mesh offsets). Visual meshes only (meshes/*.dae, Z up, metres).
+     tool0 is the tool flange (z out of the flange face), where an end effector mounts. -->
+<robot name="ur5e">
+  <link name="base_link"/>
+  <link name="base_link_inertia">
+    <visual><origin xyz="0 0 0" rpy="0 0 3.141592653589793"/><geometry><mesh filename="meshes/base.dae"/></geometry></visual>
+  </link>
+  <link name="shoulder_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 3.141592653589793"/><geometry><mesh filename="meshes/shoulder.dae"/></geometry></visual>
+  </link>
+  <link name="upper_arm_link">
+    <visual><origin xyz="0 0 0.138" rpy="1.570796326794897 0 -1.570796326794897"/><geometry><mesh filename="meshes/upperarm.dae"/></geometry></visual>
+  </link>
+  <link name="forearm_link">
+    <visual><origin xyz="0 0 0.007" rpy="1.570796326794897 0 -1.570796326794897"/><geometry><mesh filename="meshes/forearm.dae"/></geometry></visual>
+  </link>
+  <link name="wrist_1_link">
+    <visual><origin xyz="0 0 -0.127" rpy="1.570796326794897 0 0"/><geometry><mesh filename="meshes/wrist1.dae"/></geometry></visual>
+  </link>
+  <link name="wrist_2_link">
+    <visual><origin xyz="0 0 -0.0997" rpy="0 0 0"/><geometry><mesh filename="meshes/wrist2.dae"/></geometry></visual>
+  </link>
+  <link name="wrist_3_link">
+    <visual><origin xyz="0 -0.0005 -0.0989" rpy="1.570796326794897 0 0"/><geometry><mesh filename="meshes/wrist3.dae"/></geometry></visual>
+  </link>
+  <link name="flange"/>
+  <link name="tool0"/>
+
+  <joint name="base_link-base_link_inertia" type="fixed">
+    <parent link="base_link"/><child link="base_link_inertia"/><origin xyz="0 0 0" rpy="0 0 3.141592653589793"/>
+  </joint>
+  <joint name="shoulder_pan_joint" type="revolute">
+    <parent link="base_link_inertia"/><child link="shoulder_link"/>
+    <origin xyz="0 0 0.1625" rpy="0 0 0"/><axis xyz="0 0 1"/><limit lower="-6.283185307179586" upper="6.283185307179586" effort="150" velocity="3.14159"/>
+  </joint>
+  <joint name="shoulder_lift_joint" type="revolute">
+    <parent link="shoulder_link"/><child link="upper_arm_link"/>
+    <origin xyz="0 0 0" rpy="1.570796327 0 0"/><axis xyz="0 0 1"/><limit lower="-6.283185307179586" upper="6.283185307179586" effort="150" velocity="3.14159"/>
+  </joint>
+  <joint name="elbow_joint" type="revolute">
+    <parent link="upper_arm_link"/><child link="forearm_link"/>
+    <origin xyz="-0.425 0 0" rpy="0 0 0"/><axis xyz="0 0 1"/><limit lower="-3.141592653589793" upper="3.141592653589793" effort="150" velocity="3.14159"/>
+  </joint>
+  <joint name="wrist_1_joint" type="revolute">
+    <parent link="forearm_link"/><child link="wrist_1_link"/>
+    <origin xyz="-0.3922 0 0.1333" rpy="0 0 0"/><axis xyz="0 0 1"/><limit lower="-6.283185307179586" upper="6.283185307179586" effort="28" velocity="3.14159"/>
+  </joint>
+  <joint name="wrist_2_joint" type="revolute">
+    <parent link="wrist_1_link"/><child link="wrist_2_link"/>
+    <origin xyz="0 -0.0997 0" rpy="1.570796327 0 0"/><axis xyz="0 0 1"/><limit lower="-6.283185307179586" upper="6.283185307179586" effort="28" velocity="3.14159"/>
+  </joint>
+  <joint name="wrist_3_joint" type="revolute">
+    <parent link="wrist_2_link"/><child link="wrist_3_link"/>
+    <origin xyz="0 0.0996 0" rpy="1.570796326589793 3.141592653589793 3.141592653589793"/><axis xyz="0 0 1"/><limit lower="-6.283185307179586" upper="6.283185307179586" effort="28" velocity="3.14159"/>
+  </joint>
+  <joint name="wrist_3-flange" type="fixed">
+    <parent link="wrist_3_link"/><child link="flange"/><origin xyz="0 0 0" rpy="0 -1.570796326794897 -1.570796326794897"/>
+  </joint>
+  <joint name="flange-tool0" type="fixed">
+    <parent link="flange"/><child link="tool0"/><origin xyz="0 0 0" rpy="1.570796326794897 0 1.570796326794897"/>
+  </joint>
+</robot>
