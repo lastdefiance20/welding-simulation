@@ -12,7 +12,7 @@
 npm install
 npm run dev                                                   # http://localhost:5180/?project=<id>&gap=3#t=12.5
 npm run stills -- 2,12.5,24 --project <id> [--query gap=3]    # -> out/stills/<id>/t*.jpg
-npm run render -- --project <id> [--query a=b&view=wrist] [--draft] [--from s --to s]   # -> out/<id>[-a<b>][-<view>].mp4
+npm run render -- --project <id> [--query a=b&view=wrist] [--draft] [--from s --to s]   # -> out/<id>[-a<b>][-<view>][-draft].mp4
 npm run export-assets [-- --gap 3]                            # src/specimens, src/props/*.js -> assets/*.glb
 ```
 
@@ -30,6 +30,14 @@ npm run export-assets [-- --gap 3]                            # src/specimens, s
 - **사람 2F 시편:** 모서리가 x = −0.22에 있습니다. 사람은 x = −0.64에서 +x를 보고 섭니다.
 - URDF는 Z가 위쪽입니다. `src/robot/ur5e.js`가 루트를 x축으로 −90° 돌려서 월드 = (bx, bz, −by)가 됩니다. `fk`와 `ik`는 월드 좌표를 그대로 받고 돌려줍니다.
 - **토치:** `tool0`(플랜지 면, +z가 바깥)에 원점이 오도록 붙어 있습니다. TCP(와이어 끝)는 `tool0`에서 약 (0, 0, 0.33)이고 노즐 축은 플랜지 축과 33.9°입니다. **토치가 33 cm 길어서 작업 범위와 충돌이 배치를 좌우합니다.**
+
+## 새 영상 만들기 (순서)
+
+1. **예제 복사:** `cp -r projects/example-robot projects/<새-id>` (사람 영상이면 `example-human`). `project.js`의 `id`와 `title`을 바꿉니다. `id`는 폴더 이름과 같아야 합니다.
+2. **장면 수정:** 시편(`buildSpecimen` 옵션, 또는 `src/specimens/`에 새 시편), 용접 조건(`defineWeld`), 동작 순서(`steps`), 카메라(`shots`), 자막(`cards`), 리그 카메라(`setup`)를 바꿉니다.
+3. **확인:** `npm run stills -- 1,5,10,20 --project <새-id>`를 돌립니다. 출력의 `[weld] IK` 줄에서 `fails`가 0인지 보고, `out/stills/<새-id>/*.jpg`를 직접 엽니다. 리그 카메라는 `--query view=<이름>`을 붙여 따로 봅니다.
+4. **렌더:** `npm run render -- --project <새-id> --draft`로 전체 흐름을 본 뒤, `--draft` 없이 최종본을 뽑습니다. 카메라마다 따로 뽑으려면 `--query view=<이름>`을 씁니다.
+5. **결과물:** `out/<새-id>.mp4`, `out/<새-id>-<view>.mp4`, `out/stills/<새-id>/`에 생깁니다. `out/`은 git에 올리지 않습니다.
 
 ## project.js 형식
 

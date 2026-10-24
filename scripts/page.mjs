@@ -2,12 +2,19 @@
 import { chromium } from 'playwright-core';
 import { serve } from './serve.mjs';
 
-export const CHROME = process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+export const CHROME = process.env.CHROME || {
+  darwin: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  linux: '/usr/bin/google-chrome',
+  win32: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+}[process.platform];
+/** WebGL in headless Chrome: Metal on macOS; elsewhere the GPU if there is one, else SwiftShader (slow, but it works). */
+export const GL_ARGS = process.platform === 'darwin' ? ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist']
+  : ['--enable-gpu', '--ignore-gpu-blocklist', '--enable-unsafe-swiftshader'];
 export const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > 0 ? process.argv[i + 1] : d; };
 
 export async function openFilm({ project = arg('project', 'ur5e-t2f'), query = arg('query', '') } = {}) {
   const server = await serve(0);
-  const browser = await chromium.launch({ executablePath: CHROME, args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] });
+  const browser = await chromium.launch({ executablePath: CHROME, args: GL_ARGS });
   const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
   let fail;
   const failed = new Promise((_, rej) => { fail = rej; });

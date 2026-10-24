@@ -4,11 +4,11 @@
 import fs from 'node:fs';
 import { chromium } from 'playwright-core';
 import { serve } from './serve.mjs';
-import { CHROME, arg } from './page.mjs';
+import { CHROME, GL_ARGS, arg } from './page.mjs';
 
 const gap = +arg('gap', 0);
 const server = await serve(0);
-const browser = await chromium.launch({ executablePath: CHROME, args: ['--use-angle=metal', '--enable-gpu'] });
+const browser = await chromium.launch({ executablePath: CHROME, args: GL_ARGS });
 const page = await browser.newPage();
 page.on('pageerror', e => console.error('pageerror', e.message));
 await page.goto(`http://localhost:${server.address().port}/scripts/export-assets.html?gap=${gap}`);

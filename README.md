@@ -10,7 +10,7 @@ UR5e 로봇과 사람이 용접 시편을 용접하는 장면을 three.js로 만
 
 ## 시작하기
 
-macOS와 Google Chrome, ffmpeg가 필요합니다.
+Node.js 18 이상, Google Chrome, ffmpeg가 필요합니다. macOS에서 확인했습니다. Linux와 Windows는 Chrome 기본 경로와 GL 설정을 넣어 두었지만 아직 돌려 보지 않았습니다.
 
 ```bash
 npm install
@@ -21,9 +21,12 @@ npm run render -- --project example-robot --query view=wrist         # -> out/ex
 npm run render -- --project example-human --query gap=3              # 갭 3 mm 시편
 ```
 
+- 결과물은 모두 `out/`에 생기고, `out/`은 git에 올라가지 않습니다.
+  - **영상:** `out/<id>[-<param><값>][-<view>][-draft].mp4`. 예: `out/example-robot-gap3-wrist-draft.mp4`
+  - **스틸:** `out/stills/<id>[-...]/t<초>.jpg`
 - `--draft`는 720p로 빠르게 뽑습니다.
 - `--from`과 `--to`로 구간만 렌더할 수 있습니다.
-- 다른 Chrome을 쓰려면 `CHROME` 환경변수로 경로를 지정합니다.
+- Chrome이 기본 경로에 없으면 `CHROME` 환경변수로 경로를 지정합니다.
 
 ## 나레이션과 배경음악 (OpenRouter)
 
